@@ -16,6 +16,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("/tasks", async (req, res) => {
+  console.log("bateu na rota /tasks");
   try {
     const result = await client.query('SELECT * FROM tasks');
     res.json(result.rows);
