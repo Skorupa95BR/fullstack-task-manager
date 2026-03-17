@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 const express = require('express');
 const cors = require('cors');
@@ -9,7 +10,9 @@ app.use(express.json())
 
 const { Client } = require('pg');
 const client = new Client({ connectionString: process.env.DATABASE_URL });
-client.connect();
+client.connect()
+  .then(() => console.log("✅ Conectado ao banco"))
+  .catch(err => console.error("❌ Erro ao conectar:", err));
 
 app.get("/", (req, res) => {
   res.send("API funcionando 🚀")
