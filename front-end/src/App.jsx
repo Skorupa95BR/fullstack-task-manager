@@ -16,21 +16,35 @@ function App() {
         setTimeout(() => setToast(null), 3000);
     }
 
+    
+    useEffect(() => {
+    let isMounted = true;
+
     async function loadTasks() {
         try {
             setLoading(true);
             const data = await getTasks();
-            setTasks(data);
-        } catch {
+
+            if (isMounted) {
+                setTasks(data);
+            }
+        } catch (error) {
+            console.error(error);
             showToast("Erro ao carregar tarefas.", "error");
         } finally {
-            setLoading(false);
+            if (isMounted) {
+                setLoading(false);
+            }
         }
     }
 
-    useEffect(() => {
-        loadTasks();
-    }, []);
+    loadTasks();
+
+    return () => {
+        isMounted = false;
+    };
+}, []);
+
 
     function getFilteredTasks() {
         const sorted = [...tasks].sort((a, b) => a.title.localeCompare(b.title));
