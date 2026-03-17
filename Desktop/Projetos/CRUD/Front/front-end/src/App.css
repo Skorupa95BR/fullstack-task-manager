@@ -1,1 +1,7 @@
-// ...existing code...
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background-color: #1e1b4b;
+}
