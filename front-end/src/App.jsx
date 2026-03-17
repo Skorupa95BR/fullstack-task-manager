@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getTasks, createTask } from "./services/api";
 
 import TaskItem from "./components/TaskItem";
@@ -16,35 +16,22 @@ function App() {
         setTimeout(() => setToast(null), 3000);
     }
 
-    
-    useEffect(() => {
-    let isMounted = true;
-
-    async function loadTasks() {
+    const loadTasks = useCallback(async () => {
         try {
             setLoading(true);
             const data = await getTasks();
-
-            if (isMounted) {
-                setTasks(data);
-            }
-        } catch (error) {
-            console.error(error);
+            setTasks(data);
+        } catch {
             showToast("Erro ao carregar tarefas.", "error");
         } finally {
-            if (isMounted) {
-                setLoading(false);
-            }
+            setLoading(false);
         }
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    loadTasks();
-
-    return () => {
-        isMounted = false;
-    };
-}, []);
-
+    useEffect(() => {
+        loadTasks();
+    }, [loadTasks]);
 
     function getFilteredTasks() {
         const sorted = [...tasks].sort((a, b) => a.title.localeCompare(b.title));
