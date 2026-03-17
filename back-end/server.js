@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 const express = require('express');
 const cors = require('cors');
@@ -9,13 +10,16 @@ app.use(express.json())
 
 const { Client } = require('pg');
 const client = new Client({ connectionString: process.env.DATABASE_URL });
-client.connect();
+client.connect()
+  .then(() => console.log("✅ Conectado ao banco"))
+  .catch(err => console.error("❌ Erro ao conectar:", err));
 
 app.get("/", (req, res) => {
   res.send("API funcionando 🚀")
 })
 
 app.get("/tasks", async (req, res) => {
+  console.log("bateu na rota /tasks");
   try {
     const result = await client.query('SELECT * FROM tasks');
     res.json(result.rows);
@@ -25,7 +29,7 @@ app.get("/tasks", async (req, res) => {
   }
 });
 
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 
 
 app.post("/tasks", async (req, res) => {
