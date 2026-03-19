@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { createTask } from "./services/api";
+import { getTasks, createTask } from "./services/api";
 
 import TaskItem from "./components/TaskItem";
 import TaskForm from "./components/TaskForm";
