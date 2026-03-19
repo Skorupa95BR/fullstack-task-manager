@@ -3,6 +3,8 @@ import { getTasks, createTask } from "./services/api";
 
 import TaskItem from "./components/TaskItem";
 import TaskForm from "./components/TaskForm";
+import Login from "./components/login";
+import Register from "./components/Register";
 
 function App() {
     const [tasks, setTasks] = useState([]);
@@ -10,6 +12,15 @@ function App() {
     const [title, setTitle] = useState("");
     const [filter, setFilter] = useState("all");
     const [toast, setToast] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [screen, setScreen] = useState("login");
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    }, []);
 
     function showToast(message, type = "success") {
         setToast({ message, type });
@@ -42,6 +53,13 @@ function App() {
 
     const filtered = getFilteredTasks();
     const completedCount = tasks.filter(t => t.completed).length;
+
+    if (!isAuthenticated) {
+        if (screen === "register") {
+            return <Register onGoToLogin={() => setScreen("login")} />;
+        }
+        return <Login onLogin={() => setIsAuthenticated(true)} onGoToRegister={() => setScreen("register")} />;
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-900 to-slate-900 flex items-start justify-center sm:pt-10 sm:px-4">
