@@ -18,6 +18,15 @@ export async function getTasks() {
     const res = await fetch(`${API_URL}/tasks`, {
         headers: getAuthHeaders()
     });
+    
+    if (!res.ok) {
+        if (res.status === 401) {
+            localStorage.removeItem("token");
+            window.location.reload();
+        }
+        throw new Error("Erro ao buscar tarefas");
+    }
+    
     return res.json();
 }
 
@@ -27,27 +36,57 @@ export async function createTask(title) {
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify({ title })
     });
+    
+    if (!res.ok) {
+        if (res.status === 401) {
+            localStorage.removeItem("token");
+            window.location.reload();
+        }
+        throw new Error("Erro ao criar tarefa");
+    }
+    
     return res.json();
 }
 
 export async function deleteTask(id) {
-    await fetch(`${API_URL}/tasks/${id}`, {
+    const res = await fetch(`${API_URL}/tasks/${id}`, {
         method: "DELETE",
         headers: getAuthHeaders()
     });
+    
+    if (!res.ok && res.status === 401) {
+        localStorage.removeItem("token");
+        window.location.reload();
+    }
 }
 
 export async function toggleTask(id) {
-    await fetch(`${API_URL}/tasks/${id}/toggle`, {
+    const res = await fetch(`${API_URL}/tasks/${id}/toggle`, {
         method: "PATCH",
         headers: getAuthHeaders()
     });
+    
+    if (!res.ok) {
+        if (res.status === 401) {
+            localStorage.removeItem("token");
+            window.location.reload();
+        }
+        throw new Error("Erro ao alternar tarefa");
+    }
 }
 
 export async function updateTask(id, title) {
-    await fetch(`${API_URL}/tasks/${id}`, {
-        method: "PATCH",
+    const res = await fetch(`${API_URL}/tasks/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify({ title })
     });
+    
+    if (!res.ok) {
+        if (res.status === 401) {
+            localStorage.removeItem("token");
+            window.location.reload();
+        }
+        throw new Error("Erro ao atualizar tarefa");
+    }
 }

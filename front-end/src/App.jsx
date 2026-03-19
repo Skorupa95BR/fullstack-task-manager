@@ -19,6 +19,7 @@ function App() {
         const token = localStorage.getItem("token");
         if (token) {
             setIsAuthenticated(true);
+            setScreen("login");
         }
     }, []);
 
@@ -31,8 +32,9 @@ function App() {
         try {
             setLoading(true);
             const data = await getTasks();
-            setTasks(data);
+            setTasks(Array.isArray(data) ? data : []);
         } catch {
+            setTasks([]);
             showToast("Erro ao carregar tarefas.", "error");
         } finally {
             setLoading(false);
@@ -41,8 +43,10 @@ function App() {
     }, []);
 
     useEffect(() => {
-        loadTasks();
-    }, [loadTasks]);
+        if (isAuthenticated) {
+            loadTasks();
+        }
+    }, [loadTasks, isAuthenticated]);
 
     function getFilteredTasks() {
         const sorted = [...tasks].sort((a, b) => a.title.localeCompare(b.title));
@@ -71,15 +75,51 @@ function App() {
                 </div>
             )}
             <div className="w-full max-w-xl bg-slate-800 sm:shadow-2xl sm:rounded-xl p-4 sm:p-6 text-white min-h-screen sm:min-h-0 sm:my-0">
-                <h1 className="text-center text-3xl font-extrabold mb-1 tracking-tight">
-                    <span className="text-white">Task </span>
-                    <span className="text-purple-400">Manager</span>
-                </h1>
-                <p className="text-center text-slate-500 text-xs uppercase tracking-widest mb-5 font-medium">
+                <div className="flex items-center justify-between mb-1">
+                    <div className="flex-1"></div>
+                    <h1 className="text-center text-3xl font-extrabold tracking-tight">
+                        <span className="text-white">Task </span>
+                        <span className="text-purple-400">Manager</span>
+                    </h1>
+                    <div className="flex-1 flex justify-end">
+                        <button
+                            onClick={() => {
+                                localStorage.removeItem("token");
+                                setIsAuthenticated(false);
+                                setScreen("login");
+                            }}
+                            className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700/50 rounded-lg"
+                            title="Sair"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <p className="text-center text-slate-500 text-xs uppercase tracking-widest mb-2 font-medium">
                     {tasks.length === 0
                         ? "nenhuma tarefa"
                         : `${completedCount} de ${tasks.length} concluída${completedCount !== 1 ? "s" : ""}`}
                 </p>
+
+                {/* Barra de Progresso */}
+                {tasks.length > 0 && (
+                    <div className="mb-5">
+                        <div className="bg-slate-900/60 rounded-full h-3 overflow-hidden border border-slate-700/50">
+                            <div 
+                                className="h-full bg-gradient-to-r from-purple-500 to-green-500 transition-all duration-500 ease-out flex items-center justify-end pr-1"
+                                style={{ width: `${(completedCount / tasks.length) * 100}%` }}
+                            >
+                                {completedCount > 0 && (
+                                    <span className="text-[10px] font-bold text-white drop-shadow">
+                                        {Math.round((completedCount / tasks.length) * 100)}%
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="flex gap-1 mb-6 justify-center bg-slate-900/50 rounded-full p-1 w-fit mx-auto">
                     {["all", "pending", "completed"].map(f => (

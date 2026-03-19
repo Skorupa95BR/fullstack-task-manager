@@ -64,7 +64,7 @@ function TaskItem({ task, loadTasks, showToast }) {
             ) : (
                 <span
                     className={`flex-1 font-medium text-base ${
-                        task.completed ? "line-through text-slate-500" : "text-white cursor-pointer"
+                        task.completed ? "line-through text-slate-500" : "text-white sm:cursor-pointer"
                     }`}
                     onDoubleClick={() => { if (!task.completed) setEditing(true); }}
                     title={task.completed ? "" : "Clique duplo para editar"}
@@ -72,7 +72,7 @@ function TaskItem({ task, loadTasks, showToast }) {
                     {task.title}
                 </span>
             )}
-            <div className="flex gap-2 ml-3">
+            <div className="flex gap-1 sm:gap-2 ml-3">
                 {editing ? (
                     <>
                         <button className="px-2 py-1 text-green-400 hover:text-green-300 text-sm" onClick={handleEdit}>Salvar</button>
@@ -95,7 +95,17 @@ function TaskItem({ task, loadTasks, showToast }) {
                         </button>
                     </div>
                 ) : (
-                    <button className="px-3 py-1 text-xs font-medium text-slate-400 sm:text-slate-600 hover:text-red-400 border border-transparent hover:border-red-500/30 hover:bg-red-500/10 rounded transition-all sm:opacity-0 sm:group-hover:opacity-100" onClick={handleDelete}>Deletar</button>
+                    <>
+                        {!task.completed && (
+                            <button 
+                                className="sm:hidden px-2 py-1 text-xs font-medium text-purple-400 hover:text-purple-300 border border-purple-500/30 hover:bg-purple-500/10 rounded transition-all"
+                                onClick={() => setEditing(true)}
+                            >
+                                Editar
+                            </button>
+                        )}
+                        <button className="px-2 sm:px-3 py-1 text-xs font-medium text-slate-400 sm:text-slate-600 hover:text-red-400 border border-transparent hover:border-red-500/30 hover:bg-red-500/10 rounded transition-all sm:opacity-0 sm:group-hover:opacity-100" onClick={handleDelete}>Deletar</button>
+                    </>
                 )}
             </div>
         </div>
