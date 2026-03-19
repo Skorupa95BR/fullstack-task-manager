@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getTasks, createTask } from "./services/api";
+import { createTask } from "./services/api";
 
 import TaskItem from "./components/TaskItem";
 import TaskForm from "./components/TaskForm";
@@ -22,6 +22,12 @@ function App() {
             setScreen("login");
         }
     }, []);
+
+    function handleLogout() {
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+        setTasks([]);
+    }
 
     function showToast(message, type = "success") {
         setToast({ message, type });
