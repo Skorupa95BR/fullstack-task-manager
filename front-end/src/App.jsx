@@ -23,12 +23,6 @@ function App() {
         }
     }, []);
 
-    function handleLogout() {
-        localStorage.removeItem("token");
-        setIsAuthenticated(false);
-        setTasks([]);
-    }
-
     function showToast(message, type = "success") {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3000);
@@ -92,6 +86,7 @@ function App() {
                             onClick={() => {
                                 localStorage.removeItem("token");
                                 setIsAuthenticated(false);
+                                setTasks([]);
                                 setScreen("login");
                             }}
                             className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700/50 rounded-lg"
