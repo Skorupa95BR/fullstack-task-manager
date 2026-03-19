@@ -14,7 +14,9 @@ app.use('/auth', authRoutes);
 import pg from 'pg';
 const { Client } = pg;
 const client = new Client({ connectionString: process.env.DATABASE_URL });
-client.connect();
+client.connect()
+  .then(() => console.log("✅ Conectado ao banco"))
+  .catch(err => console.error("❌ Erro ao conectar:", err));
 
 app.get("/tasks", authMiddleware, async (req, res) => {
   try {
@@ -50,6 +52,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("/tasks", async (req, res) => {
+  console.log("bateu na rota /tasks");
   try {
     const result = await client.query('SELECT * FROM tasks');
     res.json(result.rows);
