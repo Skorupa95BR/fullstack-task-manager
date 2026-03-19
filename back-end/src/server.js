@@ -1,15 +1,49 @@
-require('dotenv').config();
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import authRoutes from './routes/auth.routes.js';
+import { authMiddleware } from './middlewares/auth.middleware.js';
 
-const express = require('express');
-const cors = require('cors');
 const app = express();
 
 app.use(cors())
 app.use(express.json())
 
-const { Client } = require('pg');
+app.use('/auth', authRoutes);
+
+import pg from 'pg';
+const { Client } = pg;
 const client = new Client({ connectionString: process.env.DATABASE_URL });
 client.connect();
+
+app.get("/tasks", authMiddleware, async (req, res) => {
+  try {
+    const result = await client.query(
+      'SELECT * FROM tasks WHERE user_id = $1',
+      [req.userId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).send("Erro ao buscar tasks");
+  }
+})
+
+app.post("/tasks", authMiddleware, async (req, res) => {
+    const { title } = req.body;
+
+   try{
+    const result = await client.query(
+      'INSERT INTO tasks (title, user_id) VALUES ($1, $2) RETURNING *',
+      [title, req.userId]
+    );
+
+    res.json(result.rows[0]);
+   } catch (error) {
+    res.status(500).send("Erro ao criar task");
+   }
+}) 
+
 
 app.get("/", (req, res) => {
   res.send("API funcionando 🚀")
@@ -33,8 +67,8 @@ app.post("/tasks", async (req, res) => {
     const { title } = req.body;
 
     const result = await client.query(
-      'INSERT INTO tasks (title) VALUES ($1) RETURNING *',
-      [title]
+      'INSERT INTO tasks (title, user_id) VALUES ($1, $2) RETURNING *',
+      [title, 1]
     );
 
     if(!title){
