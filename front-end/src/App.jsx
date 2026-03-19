@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getTasks, createTask } from "./services/api";
+import { createTask } from "./services/api";
 
 import TaskItem from "./components/TaskItem";
 import TaskForm from "./components/TaskForm";
@@ -22,6 +22,12 @@ function App() {
         }
     }, []);
 
+    function handleLogout() {
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+        setTasks([]);
+    }
+
     function showToast(message, type = "success") {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3000);
@@ -30,7 +36,14 @@ function App() {
     const loadTasks = useCallback(async () => {
         try {
             setLoading(true);
-            const data = await getTasks();
+            const res = await fetch(`${process.env.REACT_APP_API_URL || 'https://task-manager-api-ccfp.onrender.com'}/tasks`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            });
+            if (res.status === 401) {
+                handleLogout();
+                return;
+            }
+            const data = await res.json();
             setTasks(data);
         } catch {
             showToast("Erro ao carregar tarefas.", "error");
@@ -41,8 +54,10 @@ function App() {
     }, []);
 
     useEffect(() => {
-        loadTasks();
-    }, [loadTasks]);
+        if (isAuthenticated) {
+            loadTasks();
+        }
+    }, [isAuthenticated, loadTasks]);
 
     function getFilteredTasks() {
         const sorted = [...tasks].sort((a, b) => a.title.localeCompare(b.title));
@@ -71,10 +86,18 @@ function App() {
                 </div>
             )}
             <div className="w-full max-w-xl bg-slate-800 sm:shadow-2xl sm:rounded-xl p-4 sm:p-6 text-white min-h-screen sm:min-h-0 sm:my-0">
-                <h1 className="text-center text-3xl font-extrabold mb-1 tracking-tight">
-                    <span className="text-white">Task </span>
-                    <span className="text-purple-400">Manager</span>
-                </h1>
+                <div className="flex justify-between items-center mb-1">
+                    <h1 className="text-3xl font-extrabold tracking-tight">
+                        <span className="text-white">Task </span>
+                        <span className="text-purple-400">Manager</span>
+                    </h1>
+                    <button
+                        onClick={handleLogout}
+                        className="text-xs text-slate-400 hover:text-red-400 transition-colors"
+                    >
+                        Sair
+                    </button>
+                </div>
                 <p className="text-center text-slate-500 text-xs uppercase tracking-widest mb-5 font-medium">
                     {tasks.length === 0
                         ? "nenhuma tarefa"
