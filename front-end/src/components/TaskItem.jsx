@@ -39,19 +39,19 @@ function TaskItem({ task, loadTasks, showToast }) {
     }
 
     return (
-        <div className={`flex flex-col sm:flex-row sm:items-center rounded-lg mb-1.5 py-2.5 px-4 transition-all group ${
+        <div className={`flex items-center justify-between rounded-lg mb-1.5 py-2.5 px-4 transition-all group ${
             task.completed
                 ? "bg-slate-800/30 border border-slate-700/30 opacity-55"
                 : "bg-slate-800 border border-slate-700/60 border-l-2 border-l-purple-500 shadow-sm hover:shadow-md hover:border-slate-600"
         }`}>
-            <div className="flex items-center w-full">
-                <input
-                    type="checkbox"
-                    checked={task.completed}
-                    className="mr-3 accent-purple-500 cursor-pointer flex-shrink-0"
-                    onChange={handleToggle}
-                />
-                {editing ? (
+            <input
+                type="checkbox"
+                checked={task.completed}
+                className="mr-3 accent-purple-500 cursor-pointer flex-shrink-0"
+                onChange={handleToggle}
+            />
+            {editing ? (
+                <div className="flex-1 flex flex-col sm:flex-row gap-2 sm:items-center">
                     <input
                         className="flex-1 bg-slate-600 border border-purple-500 rounded px-2 py-1 text-sm text-white focus:outline-none"
                         value={editValue}
@@ -62,21 +62,7 @@ function TaskItem({ task, loadTasks, showToast }) {
                         }}
                         autoFocus
                     />
-                ) : (
-                    <span
-                        className={`flex-1 font-medium text-base ${
-                            task.completed ? "line-through text-slate-500" : "text-white sm:cursor-pointer"
-                        }`}
-                        onDoubleClick={() => { if (!task.completed) setEditing(true); }}
-                        title={task.completed ? "" : "Clique duplo para editar"}
-                    >
-                        {task.title}
-                    </span>
-                )}
-            </div>
-            <div className={`flex gap-1.5 sm:gap-2 ${editing ? 'mt-2 sm:mt-0' : ''} sm:ml-3`}>
-                {editing ? (
-                    <>
+                    <div className="flex gap-1.5">
                         <button 
                             className="flex-1 sm:flex-none px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded transition-colors"
                             onClick={handleEdit}
@@ -89,35 +75,49 @@ function TaskItem({ task, loadTasks, showToast }) {
                         >
                             Cancelar
                         </button>
-                    </>
-                ) : confirming ? (
-                    <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-800 border border-red-500/40 rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 w-full sm:w-auto">
-                        <span className="hidden sm:inline text-slate-400 text-xs mr-1">Deletar?</span>
-                        <button
-                            className="flex-1 sm:flex-none bg-red-600 hover:bg-red-500 text-white text-xs font-semibold px-2 sm:px-3 py-1 rounded transition-colors"
-                            onClick={handleDelete}
-                        >
-                            Confirmar
-                        </button>
-                        <button
-                            className="flex-1 sm:flex-none bg-slate-600 hover:bg-slate-500 text-slate-200 text-xs font-medium px-2 sm:px-3 py-1 rounded transition-colors"
-                            onClick={() => setConfirming(false)}
-                        >
-                            Cancelar
-                        </button>
                     </div>
-                ) : (
-                    <>
-                        {!task.completed && (
+                </div>
+            ) : (
+                <>
+                    <span
+                        className={`flex-1 font-medium text-base ${
+                            task.completed ? "line-through text-slate-500" : "text-white sm:cursor-pointer"
+                        }`}
+                        onDoubleClick={() => { if (!task.completed) setEditing(true); }}
+                        title={task.completed ? "" : "Clique duplo para editar"}
+                    >
+                        {task.title}
+                    </span>
+                    <div className="flex gap-1.5 sm:gap-2 ml-3">
+                        {confirming ? (
+                            <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-800 border border-red-500/40 rounded-lg px-2 sm:px-3 py-1 sm:py-1.5">
+                                <span className="hidden sm:inline text-slate-400 text-xs mr-1">Deletar?</span>
+                                <button
+                                    className="bg-red-600 hover:bg-red-500 text-white text-xs font-semibold px-2 sm:px-3 py-1 rounded transition-colors"
+                                    onClick={handleDelete}
+                                >
+                                    Confirmar
+                                </button>
+                                <button
+                                    className="bg-slate-600 hover:bg-slate-500 text-slate-200 text-xs font-medium px-2 sm:px-3 py-1 rounded transition-colors"
+                                    onClick={() => setConfirming(false)}
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        ) : (
                             <button 
-                                className="sm:hidden flex-1 px-2 py-1 text-xs font-medium text-purple-400 hover:text-purple-300 border border-purple-500/30 hover:bg-purple-500/10 rounded transition-all"
-                                onClick={() => setEditing(true)}
+                                className="px-2 sm:px-3 py-1 text-xs font-medium text-slate-400 sm:text-slate-600 hover:text-red-400 border border-transparent hover:border-red-500/30 hover:bg-red-500/10 rounded transition-all sm:opacity-0 sm:group-hover:opacity-100" 
+                                onClick={handleDelete}
                             >
-                                Editar
+                                Deletar
                             </button>
                         )}
-                        <button 
-                            className="flex-1 sm:flex-none px-2 sm:px-3 py-1 text-xs font-medium text-slate-400 sm:text-slate-600 hover:text-red-400 border border-transparent hover:border-red-500/30 hover:bg-red-500/10 rounded transition-all sm:opacity-0 sm:group-hover:opacity-100" 
+                    </div>
+                </>
+            )}
+        </div>
+    );
                             onClick={handleDelete}
                         >
                             Deletar
