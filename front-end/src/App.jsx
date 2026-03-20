@@ -7,7 +7,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://task-manager-api-ccfp.
 function App() {
     // Wake-up: acorda o backend no Render ao abrir o site
     useEffect(() => {
-        fetch($/ping).catch(() => {});
+        fetch(`${API_URL}/ping`).catch(() => {});
     }, []);
 
     return (
