@@ -6,6 +6,8 @@ import TaskForm from "./components/TaskForm";
 import Login from "./components/login";
 import Register from "./components/Register";
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://task-manager-api-ccfp.onrender.com';
+
 function App() {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,6 +16,11 @@ function App() {
     const [toast, setToast] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [screen, setScreen] = useState("login");
+
+    // Wake-up: acorda o backend no Render ao abrir o site
+    useEffect(() => {
+        fetch(`${API_URL}/ping`).catch(() => {});
+    }, []);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -66,7 +73,7 @@ function App() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-slate-900 flex items-start justify-center sm:pt-10 sm:px-4">
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-slate-900 flex items-start justify-center p-4 sm:pt-10 sm:px-4">
             {toast && (
                 <div className={`fixed top-0 left-0 right-0 sm:top-4 sm:left-auto sm:right-4 sm:rounded-lg z-50 px-4 py-3 shadow-lg text-white text-sm font-medium transition-all ${
                     toast.type === "error" ? "bg-red-500" : "bg-green-500"
@@ -74,7 +81,11 @@ function App() {
                     {toast.message}
                 </div>
             )}
+<<<<<<< HEAD
             <div className="w-full max-w-xl bg-slate-800 sm:shadow-2xl sm:rounded-xl p-4 sm:p-6 text-white min-h-screen sm:min-h-0 sm:my-0">
+=======
+            <div className="w-full max-w-xl bg-slate-800 shadow-2xl rounded-xl p-4 sm:p-6 text-white">
+>>>>>>> 8b19149 (feat: add /ping wake-up endpoint and fix mobile responsiveness)
                 <div className="flex items-center justify-between mb-1">
                     <div className="flex-1"></div>
                     <h1 className="text-center text-3xl font-extrabold tracking-tight">
