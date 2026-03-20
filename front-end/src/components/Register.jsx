@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/api";
 
-function Register({ onGoToLogin }) {
+function Register() {
+    const navigate = useNavigate();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ function Register({ onGoToLogin }) {
             }
 
             setSuccess(true);
-            setTimeout(() => onGoToLogin(), 2000);
+            setTimeout(() => navigate("/login"), 2000);
         } catch {
             setError("Erro ao conectar com o servidor.");
         } finally {
@@ -109,7 +111,7 @@ function Register({ onGoToLogin }) {
                             Já tem uma conta?{" "}
                             <button
                                 type="button"
-                                onClick={onGoToLogin}
+                                onClick={() => navigate("/login")}
                                 className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
                             >
                                 Entrar

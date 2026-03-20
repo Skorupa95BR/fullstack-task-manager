@@ -1,32 +1,78 @@
-import { useEffect } from "react";
-import { BrowserRouter } from "react-router-dom";
-import AppRoutes from "./routes";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getTasks, createTask } from "../services/api";
+import TaskItem from "./TaskItem";
+import TaskForm from "./TaskForm";
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://task-manager-api-ccfp.onrender.com';
+function Tasks() {
+    const [tasks, setTasks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [title, setTitle] = useState("");
+    const [filter, setFilter] = useState("all");
+    const [toast, setToast] = useState(null);
+    const navigate = useNavigate();
 
-function App() {
-    // Wake-up: acorda o backend no Render ao abrir o site
-    useEffect(() => {
-        fetch(`${API_URL}/ping`).catch(() => {});
+    function showToast(message, type = "success") {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    }
+
+    const loadTasks = useCallback(async () => {
+        try {
+            setLoading(true);
+            const data = await getTasks();
+            setTasks(Array.isArray(data) ? data : []);
+        } catch {
+            setTasks([]);
+            showToast("Erro ao carregar tarefas.", "error");
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    return (
-        <BrowserRouter>
-            <AppRoutes />
-        </BrowserRouter>
-    );
-}
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+        loadTasks();
+    }, [loadTasks, navigate]);
 
-export default App;
+    function getFilteredTasks() {
+        const sorted = [...tasks].sort((a, b) => a.title.localeCompare(b.title));
+        if (filter === "pending") return sorted.filter(t => !t.completed);
+        if (filter === "completed") return sorted.filter(t => t.completed);
+        return sorted;
+    }
+
+    const filtered = getFilteredTasks();
+    const completedCount = tasks.filter(t => t.completed).length;
+
+    function handleLogout() {
+        localStorage.removeItem("token");
+        navigate("/login");
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-slate-900 flex items-start justify-center p-4 sm:pt-10 sm:px-4">
+            {toast && (
+                <div className={`fixed top-0 left-0 right-0 sm:top-4 sm:left-auto sm:right-4 sm:rounded-lg z-50 px-4 py-3 shadow-lg text-white text-sm font-medium transition-all ${
+                    toast.type === "error" ? "bg-red-500" : "bg-green-500"
+                }`}>
+                    {toast.message}
+                </div>
+            )}
+            <div className="w-full max-w-xl bg-slate-800 shadow-2xl rounded-xl p-4 sm:p-6 text-white">
+                <div className="flex items-center justify-between mb-1">
+                    <div className="flex-1"></div>
+                    <h1 className="text-center text-3xl font-extrabold tracking-tight">
+                        <span className="text-white">Task </span>
+                        <span className="text-purple-400">Manager</span>
                     </h1>
                     <div className="flex-1 flex justify-end">
                         <button
-                            onClick={() => {
-                                localStorage.removeItem("token");
-                                setIsAuthenticated(false);
-                                setTasks([]);
-                                setScreen("login");
-                            }}
+                            onClick={handleLogout}
                             className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700/50 rounded-lg"
                             title="Sair"
                         >
@@ -123,12 +169,7 @@ export default App;
                 </div>
             </div>
         </div>
-=======
-        <BrowserRouter>
-            <AppRoutes />
-        </BrowserRouter>
->>>>>>> fd7430c (feat: Adiciona React Router para navegação e cria componente Tasks)
     );
 }
 
-export default App;
+export default Tasks;
