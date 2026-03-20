@@ -6,11 +6,33 @@ function Login () {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [emailError, setEmailError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function handleEmailChange(e) {
+        const value = e.target.value;
+        setEmail(value);
+        if (value && !validateEmail(value)) {
+            setEmailError("E-mail inválido");
+        } else {
+            setEmailError("");
+        }
+    }
 
     async function handleLogin(e) {
         e.preventDefault();
         setError("");
+        
+        if (!validateEmail(email)) {
+            setEmailError("Por favor, insira um e-mail válido");
+            return;
+        }
+        
         setLoading(true);
 
         try {
@@ -106,10 +128,16 @@ function Login () {
                             type="email"
                             placeholder="seu@email.com"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={handleEmailChange}
+                            onBlur={() => email && !validateEmail(email) && setEmailError("E-mail inválido")}
                             required
-                            className="bg-slate-900/60 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+                            className={`bg-slate-900/60 border rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none transition-colors ${
+                                emailError ? "border-red-500 focus:border-red-500" : "border-slate-700 focus:border-purple-500"
+                            }`}
                         />
+                        {emailError && (
+                            <p className="text-red-400 text-xs mt-1">{emailError}</p>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-1">
