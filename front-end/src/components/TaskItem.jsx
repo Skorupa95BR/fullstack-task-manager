@@ -118,15 +118,8 @@ function TaskItem({ task, loadTasks, showToast }) {
             )}
         </div>
     );
-                            onClick={handleDelete}
-                        >
-                            Deletar
-                        </button>
-                    </>
-                )}
-            </div>
-        </div>
-    );
 }
+
+export default TaskItem;
 
 export default TaskItem;
