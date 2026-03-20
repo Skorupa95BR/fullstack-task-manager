@@ -121,5 +121,3 @@ function TaskItem({ task, loadTasks, showToast }) {
 }
 
 export default TaskItem;
-
-export default TaskItem;
