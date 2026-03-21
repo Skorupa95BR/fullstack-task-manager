@@ -8,13 +8,41 @@ function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [passwordTips, setPasswordTips] = useState({
+        minLength: false,
+        hasUpper: false,
+        hasNumber: false
+    });
     const [emailError, setEmailError] = useState("");
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    
+
     function validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    }
+
+    function validatePassword(password) {
+        const minLength = 6;
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+
+        if (password.length < minLength) {
+            return "A senha deve ter pelo menos 6 caracteres";
+        }
+        if (!hasUpper) {
+            return "A senha deve conter pelo menos uma letra maiúscula";
+        }
+        if (!hasLower) {
+            return "A senha deve conter pelo menos uma letra minúscula";
+        }
+        if (!hasNumber) {
+            return "A senha deve conter pelo menos um número";
+        }
+        return null;
     }
 
     function handleEmailChange(e) {
@@ -27,15 +55,48 @@ function Register() {
         }
     }
 
+    // eslint-disable-next-line no-redeclare
+    function validatePassword(password) {
+        const minLength = 6;
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        
+        setPasswordTips({
+            minLength: password.length >= minLength,
+            hasUpper,
+            hasNumber
+        });
+        if (password.length < minLength) {
+            return "A senha deve ter pelo menos 6 caracteres";
+        }
+        if (!hasUpper) {
+            return "A senha deve conter pelo menos uma letra maiúscula";
+        }
+        if (!hasLower) {
+            return "A senha deve conter pelo menos uma letra minúscula";
+        }
+        if (!hasNumber) {
+            return "A senha deve conter pelo menos um número";
+        }
+        return null;
+    }
+
     async function handleRegister(e) {
         e.preventDefault();
         setError("");
-        
+
         if (!validateEmail(email)) {
             setEmailError("Por favor, insira um e-mail válido");
             return;
         }
-        
+
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            setError(passwordError);
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -117,10 +178,27 @@ function Register() {
                                 type="password"
                                 placeholder="••••••••"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    validatePassword(e.target.value);
+                                }}
                                 required
                                 className="bg-slate-900/60 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
                             />
+                            <div className="mt-2 bg-slate-900/40 rounded-lg p-3 text-xs">
+                                <span className="font-semibold text-slate-400">Senha deve conter:</span>
+                                <ul className="mt-1">
+                                    <li className={`flex items-center gap-1 ${passwordTips.minLength ? 'text-green-400' : 'text-red-400'}`}>
+                                        <span>{passwordTips.minLength ? '✓' : '✗'}</span> 6 caracteres
+                                    </li>
+                                    <li className={`flex items-center gap-1 ${passwordTips.hasUpper ? 'text-green-400' : 'text-red-400'}`}>
+                                        <span>{passwordTips.hasUpper ? '✓' : '✗'}</span> 1 letra maiúscula
+                                    </li>
+                                    <li className={`flex items-center gap-1 ${passwordTips.hasNumber ? 'text-green-400' : 'text-red-400'}`}>
+                                        <span>{passwordTips.hasNumber ? '✓' : '✗'}</span> 1 número
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
                         {error && (
