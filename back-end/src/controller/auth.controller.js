@@ -2,6 +2,27 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import client from "../servies/db/connection.js";
 
+function validarSenha (password) {
+    const miniLength = 5;
+    const temMaiuscula = /[A-Z]/.test(password);
+    const temMinuscula = /[a-z]/.test(password);
+    const temNumero = /[0-9]/.test(password);
+
+    if( password.length < miniLength) {
+        return "A senha deve conter no mínimo 5 caracteres";
+    } 
+
+    if (!temMaiuscula) {
+        return "A senha deve conter pelo menos uma letra maiúscula";
+    }
+
+    if (!temMinuscula) {
+        return "A senha deve conter pelo menos uma letra minúscula";
+    }
+
+    return null;
+}
+
 async function register(req, res) {
     const { name, email, password } = req.body;
 
@@ -38,6 +59,12 @@ async function register(req, res) {
     console.error(error);
     res.status(500).json({ error: "Erro ao criar usuário" });
   }
+
+  const senhaInvalida = validarSenha(password);
+
+    if(senhaInvalida) {
+        return res.status(400).json({ error: senhaInvalida });
+    }
 }
 async function login(req, res) {
     const { email, password } = req.body;
